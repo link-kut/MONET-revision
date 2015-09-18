@@ -1,0 +1,90 @@
+\begin{thebibliography}{10}
+\providecommand{\url}[1]{{#1}}
+\providecommand{\urlprefix}{URL }
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{DOI \discretionary{}{}{}#1}\else
+  \providecommand{\doi}{DOI \discretionary{}{}{}\begingroup
+  \urlstyle{rm}\Url}\fi
+
+\bibitem{yelmzz}
+Y.~Zhang, E.~Pan, L.~Song, M.~Saad, Z.~Dawy, Z.~Han, {IEEE} Trans. Wireless
+  Commun. \textbf{14}(1), 177 (2014)
+
+\bibitem{beyondDTN}
+M.R. Schurgot, C.~Comaniciu, K.~Jaffres-Runser, {IEEE} Commun. Mag.
+  \textbf{50}(7), 155 (2012)
+
+\bibitem{bet-ady}
+A.~Papadimitriou, D.~Katsaros, Y.~Manolopoulos, Next Generation Society.
+  Technological and Legal Issues \textbf{26}, 411 (2010)
+
+\bibitem{bet-dnl}
+D.~Katsaros, N.~Dimokas, L.~Tassiulas, IEEE Network \textbf{24}(6), 23 (2010)
+
+\bibitem{centrality}
+L.C. Freeman, Social Networks \textbf{1}, 215 (1979)
+
+\bibitem{bet-ab}
+A.~Jain, B.V.R. Reddy, in \emph{Proc. of 2013 IEEE 3rd International Advance
+  Computing Conference (IACC)} (2013), pp. 127--131
+
+\bibitem{SIMBET}
+E.M. Daly, M.~Haahr, {IEEE} Trans. Mobile Comput. \textbf{8}(5), 606 (2009)
+
+\bibitem{IEEE:bubble}
+P.~Hui, J.~Crowcroft, E.~Yoneki, in \emph{{IEEE} Trans. Mobile Comput.},
+  vol.~10 (2008), vol.~10, pp. 1576--1589
+
+\bibitem{DimokasKM07}
+N.~Dimokas, D.~Katsaros, Y.~Manolopoulos, in \emph{Proc. of the 3rd
+  International Conference on Mobile Multimedia Communications, MobiMedia 2007}
+  (2007), pp. 377--382
+
+\bibitem{bet-aady}
+A.~Cuzzocreaa, A.~Papadimitrioub, D.~Katsarosc, Y.~Manolopoulosb, Journal of
+  Network and Computer Applications \textbf{35}(4), 1210 (2012)
+
+\bibitem{GuptaRS05}
+I.~Gupta, D.~Riordan, S.~Sampalli, in \emph{3rd Annual Conference on
+  Communication Networks and Services Research {(CNSR} 2005)} (2005), pp.
+  255--260
+
+\bibitem{egocentric}
+P.V. Marsden, in \emph{Social Networks}, vol.~24 (2002), vol.~24, pp. 407--422
+
+\bibitem{everett}
+M.~Everett, S.P. Borgatti, Social Networks \textbf{27}(1), 31 (2005)
+
+\bibitem{ICCN:lbcdna}
+S.~Nanda, D.~Kotz, in \emph{{Proc. of IEEE ICCN}} (2008)
+
+\bibitem{Pant13:Local}
+P.~Pantazopoulos, M.~Karaliopoulos, I.~Stavrakakis, in \emph{7th Int'l Workshop
+  on Self-Organizing Systems (IFIP IWSOS'13)} (2013)
+
+\bibitem{cambridge-haggle-2009-05-29}
+J.~Scott, R.~Gass, J.~Crowcroft, P.~Hui, C.~Diot, A.~Chaintreau.
+\newblock {CRAWDAD data set cambridge/haggle (v. 2009-05-29)}.
+\newblock downloaded from http://crawdad.cs.dartmouth.edu/cambridge/haggle
+  (2009)
+
+\bibitem{4146881}
+J.~Burgess, B.~Gallagher, D.~Jensen, B.~Levine, in \emph{Proceedings of 25th
+  IEEE INFOCOM} (2006), pp. 1--11
+
+\bibitem{Dubois03}
+H.~Dubois-ferriere, M.~Grossglauser, M.~Vetterli, in \emph{Proceedings of ACM
+  MobiHoc} (2003), pp. 257--266
+
+\bibitem{Brandes01afaster}
+U.~Brandes, Journal of Mathematical Sociology \textbf{25}, 163 (2001)
+
+\bibitem{community}
+L.~Tang, H.~Liu, Synthesis Lectures on Data Mining and Knowledge Discovery
+  \textbf{2}(1) (2010)
+
+\bibitem{crawdad-papers}
+{A list of papers that use CRAWDAD data and tools}.
+\newblock \urlprefix\url{http://www.citeulike.org/group/5303/library}
+
+\end{thebibliography}

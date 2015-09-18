@@ -1,0 +1,121 @@
+\section{Introduction}
+% Recently, many researches have shown that social relationships  between wireless nodes tend to influence their message delivery and mobility patterns (see Fig. \ref{eego}). So, it has been expected that traditional social network analysis techniques based on their social relationships could be a crucial method to enhance the performance of wireless network \cite{yelmzz, beyondDTN, bet-ady, bet-dnl}. 
+Recently, researches strove to enhance the performance of wireless networks based on social network analysis since social relationships between wireless nodes tend to influence their mobility patterns and message delivery~\cite{yelmzz, beyondDTN, bet-ady, bet-dnl}. 
+Among various metrics used in social network analysis, the betweenness of a node indicates the extent to which that node is between all other nodes within the network.
+
+In a wireless network, a node with high betweenness has the capacity to facilitate both direct and indirect communications between nodes~\cite{centrality, bet-ab}.
+Therefore, researchers have been taking advantage of betweenness for a variety of purposes.
+For example, Daly et al.~\cite{SIMBET} and Hui et al.~\cite{IEEE:bubble} developed techniques that efficiently and reliably forward messages via nodes with high betweenness.
+Dimokas et al. proposed an approach that caches popular data items at nodes with high betweenness in order to reduce communication overhead~\cite{DimokasKM07}.
+Cuzzocrea et al. provided a protocol that exploits betweenness to construct an energy-efficient network topology~\cite{bet-aady}.
+Gupta et al. developed a method that groups nodes into local clusters and selects, for each cluster, a node with high betweenness as the head node, which communicates with a base station on behalf of its cluster~\cite{GuptaRS05}.
+Katsaros et al. proposed an approach that efficiently manages and upgrades a wireless network via a node with high betweenness~\cite{bet-dnl}.
+
+% The very first letter is a 2 line initial drop letter followed
+% by the rest of the first word in caps.
+%
+% form to use if the first word consists of a single letter:
+% \IEEEPARstart{A}{demo} file is ....
+%
+% form to use if you need the single drop letter followed by
+% normal text (unknown if ever used by IEEE):
+% \IEEEPARstart{A}{}demo file is ....
+%
+% Some journals put the first two words in caps:
+% \IEEEPARstart{T}{his demo} file is ....
+%
+% Here we have the typical use of a "T" for an initial drop letter
+% and "HIS" in caps to complete the first word.
+% {D}{elay}-Tolerant Networks (DTNs) are special multi-hop ad hoc networks in which nodes have any opportunity of pairwise contact to forward messages. 
+%{D}{elay}-Tolerant Networks (DTNs) are multi-hop, ad hoc networks in which mobile or stationary nodes eventually relay messages from a source node to a destination node despite lack of continuous network connectivity.
+%The routing of messages in a DTN is based on the {\em store-carry-and-forward} paradigm. 
+% That is, messages may have to be buffered for some time by intermediate relay nodes, and the mobility of those nodes must be exploited to bring messages to their destination by exchanging messages between nodes when they meet. 
+% In other words, each intermediate relay node that may potentially move buffers received messages until it forwards those messges to another relay node or the destination node.
+%In other words, each relay node buffers received messages until it forwards these messages to another node that it encounters.
+% The main challenge for DTN routing is to make an effective forwarding decision, such that the chosen relay nodes have the highest overall probability to forward messages to the destination within the delay bound. 
+%Since a node may be able to communicate with multiple nodes, a key challenge in DTN routing is to select nodes that have the highest probability to relay messages to the destination within a time bound.
+% Due to the lack of global knowledge of the network topology and unstable end-to-end path in DTNs, the message routing schemes are generally made by adopting various heuristics \cite{Epidemic, SprayWait, PRoPHET, EvalSpace, DiversityForarding}. 
+% They have tried to balance the overhead caused by redundant message copies with successful delivery and minimal delay of message delivery. 
+% Accordingly, multi-objective optimization is needed to solve the trade-off problems.
+%Traditional DTN routing schemes strive to find such relay nodes while striking a balance among the network overhead, speed, and reliability of message delivery~\cite{Epidemic, SprayWait, PRoPHET, EvalSpace, DiversityForarding}. 
+
+%Due to the lack of global knowledge of the network topology and unstable end-to-end path in DTNs, the message routing schemes are generally made by adopting various heuristics, such as forwarding a number of message copies epidemically \cite{Epidemic}, controlled forwarding (or spraying) \cite{SprayWait}, utility-based forwarding (or estimating the likelihood of forwarding messages) \cite{PRoPHET}, utilizing the contact locations \cite{EvalSpace}, or focusing on the contact frequencies \cite{DiversityForarding}. Such schemes were adapted over time to address different performance measures: delivery ratio, message latency, and overhead. They have tried to balance the overhead caused by redundant copies with successful delivery and minimal delay. Accordingly, multi-objective optimization is needed to solve the trade-off problems.
+
+% Recently, many researches have shown that users tend to have mobility patterns influenced by their social relationships and/or by their attraction to physical places that have special meaning with respect to their social behavior \cite{beyondDTN}. 
+%Recently, researchers have developed heuristics that efficiently find appropriate relay nodes based on social network analysis since the social relationships between individuals tend to influence their mobility patterns and, in turn, the structural properties of DTNs~\cite{beyondDTN, IEEE:bubble, SIMBET} (Fig.~\ref{eego}).
+% The social relations achieved by complex network analysis may capture the inherent characteristics of the network topology and are less volatile than the transmission links (or physical contacts) between nodes (see Fig. \ref{eego}).
+% Accordingly, the application of social network analysis to DTNs has led to the design of a new class of DTN routing schemes. 
+% Forwarding schemes like BUBBLE Rap \cite{IEEE:bubble} and SimBetTS \cite{SIMBET} utilized a node's role in the social structure of the network to make routing decisions.
+%Message forwarding schemes such as BUBBLE Rap \cite{IEEE:bubble} and SimBetTS \cite{SIMBET} estimate each node's role in the social structure of the network and let nodes that play a central role relay messages.
+%Among various centrality metrics such as degree centrality, closeness, betweenness, and eigenvector centrality~\cite{centrality}, this paper focuses on betweenness since the betweenness of a node indicates the extent to which a node is between all other nodes within the network~\cite{SIMBET,IEEE:bubble}.
+%Therefore, a node with high betweenness has the capacity to facilitate both direct and indirect communications between nodes.
+
+% If a sender node could know that which node is important to utilize as a relay node, it would forward messages to such node to increase overall routing efficiency. 
+% Node centrality analysis is about identifying the most important nodes in a network. 
+% Commonly used criteria include degree centrality, betweenness centrality, closeness centrality and eigenvector centrality. 
+% The betweenness centrality (hereinafter referred to as just "betweenness"), among those centrality, examines the extent to which a node is between all other nodes within the network \cite{IEEE:bubble,SIMBET,centrality}. 
+% Because a node with high betweenness has the capacity to facilitate interactions between nodes, it has been frequently used to design efficient data forwarding and dissemination schemes in DTNs.
+
+% In order to calculate the betweenness of each node, we need to find the shortest paths between every pair of nodes in the given network.
+Calculating the betweenness of each node, however, requires finding all of the shortest paths between every pair of nodes in the given network.
+Since carrying out this task in a large wireless network will incur prohibitively expensive network and computational costs, techniques for estimating betweenness have been developed~\cite{SIMBET,egocentric,everett,ICCN:lbcdna,Pant13:Local}.
+In these techniques, each node identifies its \emph{ego network}, a logical network consisting of that node, its 1-hop neighbors, and all links between these nodes.
+Then, each node calculates, as an estimate of its betweenness in the entire network, its betweenness only in its ego network, thereby saving both network and computational resources.
+%We call this approximate betweenness \emph{ego betweenness} in this paper.
+
+
+% However, such tasks between every pair are computationally prohibitive for large-scale DTN networks. 
+% To make matter worse, a DTN node cannot know the entire information of network topology. 
+% It means that the application of betweenness to DTN routing is not easy. 
+% Even in BUBBLE Rap \cite{IEEE:bubble} known as a representative sociality-based DTN routing scheme, the authors made use of the average unit-time degree centrality instead of the betweenness after uncovering that the two values are highly correlated. 
+
+% There have been some efforts \cite{SIMBET,egocentric,everett,ICCN:lbcdna,Pant13:Local} to provide an approximation of the real betweenness by using a node's local topology information. 
+% In their study, the \emph{ego network} has been much undertaken to provide such approximation. 
+% The ego network is the network consisting of a single node together with its immediate neighbors and all the links among those nodes. 
+% The \emph{ego betweenness} is simply the centered node's betweenness in the ego network. 
+% It can be calculated locally by each node in a distributed manner without the complete knowledge of entire network. 
+% Everett et al. \cite{everett} examined the relationship between ego betweenness and (globally computed) betweenness. 
+% They generated Bernoulli networks and calculated each node's ego betweenness and betweenness on them. 
+% Then, they revealed that the relative ranks ordered by the two betweenness values have high positive correlation. 
+% It means that two nodes can compare their own locally calculated ego betweenness and the relatively higher betweenness node can be determined without the calculation of high complexity.
+
+%Then, they revealed that relative ranks ordered by betweenness and ego betweenness have similarity from 85.4\% to 98.1\%. And also, calculated average rank correlation from 8 sample real dataset was 95\%.
+%the ego betweenness, which is easily calculable than betweenness have high accuracy.
+
+%In a DTN, the delivery of each node's topology information to centralized server and the dissemination of analyzed information from server to moving DTN nodes are very resource-consuming tasks. 
+
+% Getting local information from encounter nodes and generating ego network and ego betweenness in distributed way are practically feasible. 
+% However, the ego network has been defined and used in the field of social network and its configuration and practical application to DTNs have not been much taken into consideration in the field of data communication network. 
+In a wireless network, each node can obtain its ego network if every node exchanges its neighbor information with each other so that each node becomes aware of the connections between its neighbors.
+% In a DTN, the configuration of ego network requires a node to know not only its neighbor nodes but also its neighbor nodes' neighbor information.\footnote{The latter is also known as friend-of-a-friend (FOAF) information in social network field.} 
+% For the latter information, each node need to exchange its neighbor information with each other.
+While the above message exchange allows each node to obtain information about its 2-hop neighbors (i.e., neighbors of its neighbors), the ego network of a node cannot capture that information since the coverage of the ego network is limited up to the 1-hop neighbors of the node. 
+% However, the ego network contains just a little portion of the information which a node can obtain from the message exchange. 
+% It is quite natural that a node is able to compute more accurate centrality by using the more network topology information    
+% In this paper, we extend the concept of ego network and define a new type of logical network called \emph{expanded ego network} from the DTN's perspective. 
+In this paper, we introduce a new type of logical network, called \emph{expanded ego network} (shortly, \emph{x-ego network}), which covers a larger number of nodes and links than the corresponding ego network for the same network cost.
+For this reason, the betweenness from an x-ego network (\emph{x-ego betweenness}) is in general more similar to the true betweenness than the betweenness from an ego network (\emph{ego betweenness}).
+% It is configured based on the neighbor information of a node's neighbor nodes as well as the node's neighbor information. 
+We also present four key properties of x-ego networks and an algorithm that quickly computes x-ego betweenness by taking advantage of these properties.
+% Four inherent properties of expanded ego networks are presented and used as basis for efficient computation of \emph{expanded ego betweenness}, a newly proposed measure to estimate a node's traditional betweenness centrality. 
+% Through our intensive evaluation with diverse real mobility traces, we show that the nodes' centrality ranks ordered by expanded ego betweenness have high correlation with those ordered by betweenness. 
+% We also show that expanded ego betweenness gives better approximation to betweenness than ego betweenness does. 
+% By using the properties of expanded ego networks, we finally propose an efficient algorithm to compute expanded ego betweenness and reveal the efficiency of the proposed algorithm is very high.
+Furthermore, through evaluations based on wireless trace data~\cite{cambridge-haggle-2009-05-29}, we show that x-ego betweenness more accurately estimates betweenness than ego betweenness and our algorithm more quickly computes x-ego betweenness than the state-of-the-art betweenness computation algorithm.
+
+% In summary, the contributions of this paper are twofold: 
+% 1) this study introduces a new local network called expanded ego network configured based on a node's local neighbor information, and a new measure called the expanded ego betweenness to estimate a node's centrality accurately; and 
+% 2) it proposes a fast algorithm to compute the new measure on expanded ego networks. 
+In this paper, we make the following contributions:
+\begin{itemize}
+  \item We introduce x-ego networks, which contain more information than ego networks for the same network cost and therefore lead to more accurate estimation of betweenness.
+  \item We describe properties of x-ego networks, which enable fast x-ego betweenness computation.
+  \item We provide an algorithm that computes x-ego betweenness outperforming existing techniques.
+  \item We present evaluation results that show the benefits of x-ego betweenness and our algorithm for computing x-ego betweenness.
+\end{itemize}
+
+The remainder of this paper is organized as follows. 
+Section~\ref{een} presents the definition and properties of the proposed x-ego network. 
+Section~\ref{computation} describes our algorithm for quickly computing x-ego betweenness.
+Section~\ref{evaluation} evaluates the effectiveness of x-ego betweenness and the efficiency of our x-ego betweenness algorithm.
+Finally, Section~\ref{conclusion} concludes this paper.

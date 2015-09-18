@@ -1,0 +1,391 @@
+\section{X-ego Betweenness Computation}\label{computation}
+
+This section provides an overview of previous work on betweenness computation (Section~\ref{brandes}), presents our algorithm for quickly computing x-ego betweenness (Section~\ref{algorithm}), and analytically shows the benefits of our algorithm (Section~\ref{discussion}).
+
+\subsection{Previous Work on Betweenness Computation}\label{brandes}
+% Due to the small number of nodes in x-ego networks compared to the one in the global network, the x-ego betweenness will be computed faster than globally computed betweenness. But, some nodes can have a large number of 1-hop and 2-hops neighbor nodes and the calculation of shortest paths between all pairs of such nodes can be still computationally expensive. So, we propose a fast scheme to compute the x-ego betweenness in this section.
+% Brandes \cite{Brandes01afaster} presents a fast algorithm, called \emph{Brandes}, to compute the betweenness of each vertex in a given graph.
+To the best of our knowledge, the fastest algorithm for computing the betweenness of every vertex in a given graph is developed by Brandes~\cite{Brandes01afaster}.
+%It is based on solving a single source shortest path problem (SSSP) from each vertex. 
+Given an unweighted graph, this algorithm performs breadth first search from each vertex to compute the number of shortest paths from that vertex (i.e., the root of search) to each visited vertex.
+% Such path computation from a vertex produces a directed acyclic graph (DAG) encoding all shortest paths starting at the vertex. 
+% By backward aggregation of counter values, the contributions of these paths to the betweenness can be computed in linear time. 
+The Brandes algorithm then derives the betweenness of each vertex by aggregating the previously computed count values backwards along the edges.
+% By backward aggregation of counter values, the contributions of these paths to the betweenness can be computed in linear time. 
+% The algorithm takes time between $O(VE)$ time for unweighted graphs. 
+Given an unweighted graph $G(V, E)$, this Brandes algorithm takes $O(|V| |E|)$ time.
+% Although this is polynomial time, it is still prohibitive for networks with many number of vertices and edges.
+% Bader and Madduri \cite{bader06centrality} present a parallel implementation of the algorithm that can handle a few million nodes.
+
+% It is worth noting that the Brandes algorithm tries to compute the betweenness of all vertices in a given graph. 
+% This is a drawback of getting betweenness values in x-ego networks, since we are interested in the betweenness of a particular vertex in x-ego network.
+The x-ego betweenness of a vertex can be found by obtaining the betweenness of that single vertex in the corresponding x-ego network.
+Applying the Brandes algorithm to the x-ego network, however, results in finding the betweenness of every vertex in the x-ego network (i.e., the Brandes algorithm incurs overhead to find unneeded information).
+% In this section, we hence propose an efficient algorithm to get the betweenness of a given vertex based on theorems in the previous section, which is suitable for computing the x-ego betweenness in x-ego networks. 
+% We are currently not aware of any previous work that more quickly computes the betweenness of a vertex than the Brandes algorithm.
+Section~\ref{algorithm} presents our algorithm that quickly computes x-ego betweenness by computing the betweenness of only the target vertex and by skipping computations according to the properties of x-ego networks explained in Section~\ref{x-go_properties}.
+
+\subsection{Our X-Ego Betweenness Algorithm}\label{algorithm}
+
+\begin{table}
+\caption{Dependency table for vertex $v$ in Fig.~\ref{eego2}(b)}\label{dependency_table}
+\begin{center}
+\resizebox{8.3cm}{!} {
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{|c|c|c|@{}cccc@{}|@{}ccccc@{}|}
+ \hline
+ \hline
+\multicolumn{3}{|c|}{vertex group} & \multicolumn{4}{|c|}{$\V{v}{1}$} & \multicolumn{5}{|c|}{$\V{v}{2}$} \\ 
+\hline
+\multirow{2}{*}{mapping $I$} &
+\multicolumn{2}{|c|}{vertex} & $a$ & $b$ & $c$ & $d$ & $e$ & $f$ & $g$ & $h$ & $i$ \\ 
+%\hline
+& \multicolumn{2}{|c|}{index} & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 \\ 
+\hline
+\multirow{4}{*}{$\V{v}{1}$} & $a$ & 1 & 0 & \normalsize{\bf 0} & \normalsize{\bf 1/2} & \normalsize{\bf 1/1} & \normalsize{\bf 0} & \normalsize{\bf 0} & \normalsize{\bf 0} & \normalsize{\bf 2/3} & \normalsize{\bf 1/1} \\
+& $b$ & 2 & 0 & 0 & \normalsize{\bf 1/1} & \normalsize{\bf 1/1} & \normalsize{\bf 0} & \normalsize{\bf 0} & \normalsize{\bf 0} & \normalsize{\bf 2/2} & \normalsize{\bf 1/1} \\
+& $c$ & 3 & 1/2 & 1/1 & 0 & \normalsize{\bf 0} & \normalsize{\bf 1/2} & \normalsize{\bf 2/3} & \normalsize{\bf 0} & \normalsize{\bf 0} & \normalsize{\bf 0} \\
+& $d$ & 4 & 1/1 & 1/1 & 0 & 0 & \normalsize{\bf 1/1} & \normalsize{\bf 2/2} & \normalsize{\bf 0} & \normalsize{\bf 0} & \normalsize{\bf 0} \\
+ \hline
+\multirow{5}{*}{$\V{v}{2}$} & $e$ & 5 & 0 & 0 & 1/2 & 1/1 & 0 & \normalsize{\bf 0} & \normalsize{\bf 0} & \normalsize{\bf 2/3} & \normalsize{\bf 1/1} \\
+& $f$ & 6 & 0 & 0 & 2/3 & 2/2 & 0 & 0 & \normalsize{\bf 0} & \normalsize{\bf 4/5} & \normalsize{\bf 2/2} \\
+& $g$ & 7 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & \normalsize{\bf 0} & \normalsize{\bf 0} \\
+& $h$ & 8 & 2/3 & 2/2 & 0 & 0 & 2/3 & 4/5 & 0 & 0 & \normalsize{\bf 0} \\
+& $i$ & 9 & 1/1 & 1/1 & 0 & 0 & 1/1 & 2/2 & 0 & 0 & 0 \\
+ \hline
+ \hline         
+\end{tabular}
+}
+\end{center}
+\end{table}
+
+%\begin{table}[t]
+%\caption{Neighbor table of node $0$}\label{neighbor_table}
+%\begin{center}
+%\renewcommand{\arraystretch}{1.3}
+%\begin{tabular}{|c|c|}
+%\hline
+%\hline
+%$k \in \V{0}{1} \cup \V{0}{2}$ & $\V{k}{1}$ \\
+%\hline
+%$1$ & $\{ 0, 2, 5, 6, 7\}$ \\
+%\hline
+%$2$ & $\{ 0, 1, 6 \}$ \\
+%\hline
+%$3$ & $\{ 0, 4, 7, 8 \}$ \\
+%\hline
+%$4$ & $\{ 0, 3, 8, 9 \}$ \\
+%\hline
+%$5$ & $\{ 1 \}$ \\
+%\hline
+%$6$ & $\{ 1, 2 \}$ \\
+%\hline
+%$7$ & $\{ 1, 3 \}$ \\
+%\hline
+%$8$ & $\{ 3, 4 \}$ \\
+%\hline
+%$9$ & $\{ 4 \}$\\
+%\hline
+%\hline
+%\end{tabular}
+%\end{center}
+%\end{table}
+
+Given a vertex $v$ and its x-ego network $\XN{v}$, let $u$ be the number of 1-hop neighbors of $v$ (i.e., $u = |\V{v}{1}|$). 
+Furthermore, let $w$ be the number of 2-hop neighbors of $v$ (i.e., $w = |\V{v}{2}|$).
+Then, consider an one-to-one mapping $I$ from $\LV{v}{2} = \{v\} \cup \V{v}{1} \cup \V{v}{2}$ to $\{ 0, 1, 2, \cdots, u+w \}$, which maps (1) $v$ to 0, (2) each vertex in $\V{v}{1}$ to a distinct number in $\{1, 2, \cdots, u \}$, and (3) each vertex in $\V{v}{2}$ to a distinct number in $\{ u+1, u+2, \cdots, u+w \}$.
+In this case, we can assume a table which stores, for each $s$ and $t$ in $\LV{v}{2}$, $\D{s}{t}{v}$ (i.e., the dependency of a pair $s$ and $t$ on vertex $v$) as the element at the $I(s)$-th row and $I(t)$-th column.
+Table~\ref{dependency_table} shows such a {\em dependency table} for the vertex $v$ in Fig.~\ref{eego2}(b).
+For example, in the dependency table, the element at the 1st row and 3rd column is $1/2$ since $\D{a}{c}{v} = 1/2$ (Example~\ref{example2}) and $I(a) = 1$ and $I(c) = 3$.
+
+\alglanguage{pseudocode}
+\begin{algorithm}[t]
+\label{alg:main}
+\begin{algorithmic}[1]
+\State $\mathbf{Input}$: a vertex $v$ and an array $N[0,1,...,u+w]$
+\State $\mathbf{Output}$: $\BX{v}$
+\State create an array $D[1,2,...,u+w][1,2,...,u+w]$ 
+\State $sum \gets 0$
+\For{$p$ : $1$ to $u$}
+	\For{$q$ : $p+1$ to $u$} 
+		\State $D[p][q] \gets dependency1(p, q, N)$
+		\State $sum \gets sum + D[p][q]$
+	\EndFor
+	\For{$q$ : $u+1$ to $u+w$} 
+		\State $D[p][q] \gets dependency2(p, q, N, D)$
+		\State $sum \gets sum + D[p][q]$
+	\EndFor
+\EndFor
+\For{$p$ : $u+1$ to $u+w$} 
+	\For{$q$ : $p+1$ to $u+w$}
+		\State $D[p][q] \gets dependency2(p, q, N, D)$
+		\State $sum \gets sum + D[p][q]$
+	\EndFor
+\EndFor
+\State \Return{$\frac{2 \cdot sum}{(u+w)(u+w-1)}$} 
+\caption{$x\mhyphen ego\_{betweenness}(v,N)$}\label{alg:main}
+
+\end{algorithmic}
+\end{algorithm}
+\alglanguage{pseudocode}
+\begin{algorithm}[t]
+\begin{algorithmic}[1]
+\State $\mathbf{Input}$: $p$, $q$, $N[0,1,...,u+w]$
+\If{$q \in N[p]$}
+	\State \Return{$0$} \Comment{by Theorem 1}
+\Else
+	\State \Return{$1/{\mid N[p] \cap N[q] \mid}$} \Comment{by Theorem 2}
+\EndIf
+\caption{$dependency1(p, q, N)$}
+\label{alg:dependency1}
+\end{algorithmic}
+\end{algorithm}
+\alglanguage{pseudocode}
+\begin{algorithm}[t]
+\begin{algorithmic}[1]
+\State $\mathbf{Input}$: $p$, $q$, $N[0,1,...,u+w]$, $D[1,2,...,u+w][1,2,...,u+w]$
+\State $C \gets []$\;
+\For{each $r \in N[q]$}
+	\If {$p < r$}
+		\State $\tau = D[p][r]$
+	\Else 
+		\State $\tau = D[r][p]$
+	\EndIf
+	\If {$\tau==0$}
+		\State \Return{0} \Comment{by Theorem 3}
+	\Else 
+		\State append $\tau$ to $C$
+	\EndIf
+\EndFor
+\State \Return{$\bar{H}(C)$}    \Comment{by Theorem 4}
+\caption{$dependency2(p, q, N, D)$}
+\label{alg:dependency2}
+\end{algorithmic}
+\end{algorithm}
+
+% For an ego node $v$ and its x-ego network $\XN{v}$, let $u$ and $w$ be the number of nodes in $\LV{v}{1}-\{v\}$ and $\LV{v}{2}-\LV{v}{1}$, respectively. Then, we conceive the node indices belong to a finite index set $I = \lbrace 0, 1, 2, \cdots, u+w-1, u+w \rbrace$. Without loss of generality, hereinafter, the node $v$ centered in $\XN{v}$ is always indexed by $0$, the nodes in $\LV{v}{1}-\{v\}$ are indexed by $\lbrace 1, 2, \cdots, u \rbrace$, and the nodes in $\LV{v}{2}-\LV{v}{1}$ by $\lbrace u+1, u+2, \cdots, u+w \rbrace$. 
+% 
+% Let's consider the {\em dependency table} which includes all dependency values ($\D{s}{t}{v}$) across every pair of nodes $s$ and $t$ (except $v$) in $\XN{v}$. For example, Table \ref{dependency_table} shows the dependency values for the ego node $v$ in Fig. \ref{eego} (c). The symmetry of the table along its diagonal axis essentially cuts in half the number of shortest paths which we need to compute. From the symmetric table, we can extract the four matrices $A_{ab}$ ($a, b \in \lbrace 1, 2\rbrace$), where $A_{11}$ and $A_{22}$ denote the $u \times u$ and $w \times w$ symmetric matrices of which entry represents the dependency $\D{s}{t}{v}$ between two 1-hop neighbor nodes and between two 2-hop neighbor nodes, respectively. Due to the symmetry of $A_{11}$ and $A_{22}$ (i.e., $A_{11} = {A_{11}}^T$ and $A_{22} = {A_{22}}^T$), $\D{s}{t}{v} = \D{t}{s}{v}$ for $s$ and $t$ such that $s, t \leq u$ or $u < s, t \leq w$.
+% 
+% On the other hand, $A_{12}$ and $A_{21}$ denote the $u \times w$ and $w \times u$ matrices of which entry represents the one from an 1-hop neighbor node to an 2-hop neighbor node and from an 2-hop neighbor node to an 1-hop neighbor node, respectively. For $s$ and $t$ such that both $s \leq u$ and $u < t \leq w$ or $t \leq u$ and $u < s \leq w$, $\D{s}{t}{v} = \D{t}{s}{v}$ since $A_{12}={A_{21}}^T$.
+
+% To compute x-ego betweenness, we need to compute $D{s}{t}{v}$ values which locate in one of the following three parts:
+% \begin{itemize}
+% \item {\bf Part 1}: the upper triangular part of $A_{11}$
+% \item {\bf Part 2}: the whole part of $A_{12}$
+% \item {\bf Part 3}: the upper triangular part of $A_{22}$ 
+% \end{itemize} 
+
+Algorithm~\ref{alg:main} describes our approach for quickly computing $\BX{v}$.
+This approach uses a 1-dimensional array $N[0,1,...,u+w]$ whose $p$-th element, $N[p]$, is a collection storing $I(n)$ for each 1-hop neighbor $n$ of vertex $s$ such that $I(s)=p$.
+For example, in Fig.~\ref{eego2}(b) and Table~\ref{dependency_table}, $\V{v}{1}=\{a, b, c, d\}$ and $I(v) = 0, I(a) = 1, I(b) = 2, I(c) = 3$, and $I(d) = 4$.
+Therefore, $N[0] = \{I(n) : n \in \V{v}{1} \} = \{I(a), I(b), I(c), I(d) \} = \{ 1, 2, 3, 4 \}$.
+Algorithm~\ref{alg:main} builds a 2-dimensional array $D[1,2,...,u+w][1,2,...,u+w]$ to store and then quickly retrieve dependency values. 
+As further explained below, for vertices $s$ and $t$ such that $I(s) < I(t)$, Algorithm~\ref{alg:main} stores $\D{s}{t}{v}$ at $D[I(s)][I(t)]$ (lines 7, 11, and 17).
+Since $\D{s}{t}{v} = \D{t}{s}{v}$ for all vertices $s$ and $t$ (Section~\ref{betweenness}), $\D{t}{s}{v}$ can also be obtained from $D[I(s)][I(t)]$.
+As a result, Algorithm~\ref{alg:main} stores dependency values only in $D[p][q]$ for all $p, q \in \{1, 2, \cdots, u+w \}$ such that $p < q$ (see the dependency values in boldface above the diagonal in Table~\ref{dependency_table}).
+
+% We first compute the fraction $\D{s}{t}{v}$ in Part 1. ...
+
+For $p \in \{1, 2, \cdots, u \}$ and $q \in \{ p+1, 2, \cdots, u \}$ (lines 5 - 9 in Algorithm~\ref{alg:main}), by the definition of mapping $I$, there exist $s \in \V{v}{1}$ and $t \in \V{v}{1}$ such that $p = I(s)$ and $q = I(t)$.
+If there is an edge between $s$ and $t$ (i.e., $t \in \V{s}{1}$ and, equivalently, $q \in N[p]$), $\D{s}{t}{v} = 0$ (Theorem~\ref{theorem1}).
+Otherwise, $\D{s}{t}{v} = \frac{1}{|\V{s}{1} \cap \V{t}{1}|} = \frac{1}{|N[p] \cap N[q]|}$ (Theorem~\ref{theorem2}).
+Given $p$ and $q$ as well as array $N$, Algorithm~\ref{alg:dependency1} computes $\D{s}{t}{v}$ as mentioned above. 
+The resulting value is saved at $D[p][q]$ (line 7 in Algorithm~\ref{alg:main}) and incorporated into the sum of calculated dependency values (line 8).
+
+
+%For each node $v_s$ in $N_0$, we need to first determine the number of shortest paths of length 2 starting from $v_s$ and terminating at another node $v_t$ in $N_0$ where $s < t$. We do not need to consider the shortest paths of length 1 among those nodes because such a path neither passes through the centered node $i$ nor contributes to the expanded ego betweenness. 
+%
+%By using the proposition \ref{prop1}, Algorithm \ref{algo1} computes the fraction values in the upper triangular part of $A_{11}$, while accumulating the expanded ego betweenness ({\it line $7$}). The total number of iterations of the inner loop is given by $u \cdot (u-1) /2 \in O(u^2)$.
+
+% \begin{algorithm}[t]
+% \DontPrintSemicolon
+% \KwIn{$N[1...u+w]$, $D[1...u+w][1...u+w]$}
+% \KwOut{$\BX{0}$}
+% \For{$s$ : $1$ to $u$}{ 
+% 	\For{$t$ : $s+1$ to $u$}{ 
+% 		$D[s][t] \gets dependency1(s, t, N)$
+% 		$\BX{0} \gets \BX{0} + D[s][t]$
+% 	}
+% 	\For{$t$ : $u+1$ to $u+w$}{ 
+% 		$D[s][t] \gets dependency2(s, t, N, D)$
+% 		$\BX{0} \gets \BX{0} + D[s][t]$
+% 	}
+% }
+% \For{$s$ : $u+1$ to $u+2$}{ 
+% 	\For{$t$ : $s+1$ to $u+w$}{
+% 		$D[s][t] \gets dependency2(s, t, N, D)$
+% 		$\BX{0} \gets \BX{0} + D[s][t]$
+% 	}
+% }
+% \caption{$x\mhyphen ego\_{betweenness}(N,D)$}\label{alg:main}
+% \end{algorithm}
+
+
+% \begin{algorithm}[t]
+% \DontPrintSemicolon
+% \KwIn{$s$, $t$, $N[1...u+w]$}
+% \If{$t \in N[s]$}{
+% 	\Return{$0.0$}
+% } 
+% \Else{
+% 	\Return{$1/{\mid N[s] \cap N[t] \mid}$}
+% }
+% \caption{$dependency1(s, t, N)$}\label{alg:dependency1}
+% \end{algorithm}
+
+For $p \in \{1, 2, \cdots, u \}$ and $q \in \{ u+1, u+2, \cdots, u+w \}$ (lines 10 - 13 in Algorithm~\ref{alg:main}), there exist $s \in \V{v}{1}$ and $t \in \V{v}{2}$ such that $p = I(s)$ and $q = I(t)$.
+If $\D{s}{n}{v} = 0$ for some $n \in \V{t}{1}$, then $\D{s}{t}{v} = 0$ (Theorem~\ref{theorem3}).
+Otherwise, $\D{s}{t}{v} = \bar{H}(\D{s}{n}{v})$, where $\bar{H}(\D{s}{n}{v})$ denotes the {\em harmonic mean} computed over $\{\D{s}{n}{v} : n \in \V{t}{1}\}$ (Theorem~\ref{theorem4}).
+Given $p$ and $q$ and arrays $N$ and $D$, Algorithm~\ref{alg:dependency2} computes $\D{s}{t}{v}$ for $s$ and $t$ such that $p = I(s)$ and $q = I(t)$ according to the above theorems.
+For each $r \in N[q]$ (line 3), there exists a vertex $n$ such that $n \in \V{t}{1}$ and $I(n) = r$.
+At this point, $\D{s}{n}{v}$ must have been stored at either $D[p][r]$ (if $p < r$) or $D[r][p]$ (otherwise) since $n$ is a 1-hop neighbor\footnote{In $\XN{v}$, all vertices including $n$ are at most 2 hops away from $v$. $n \ne v$ cannot be a 2-hop neighbor of $v$ since it is a 1-hop neighbor of $t$, which is a 2-hop neighbor of $v$. Therefore, $n$ can only be a 1-hop neighbor of $v$.} of $v$ (i.e., $r \in \{1, 2, \cdots, u \}$ and therefore has been handled by lines 6-9 in Algorithm~\ref{alg:main}).
+Algorithm~\ref{alg:dependency2} retrieves that dependency value (lines 4 - 8).
+When Algorithm~\ref{alg:dependency2} returns $\D{s}{t}{v}$ (lines 10 and 15), that value is saved at $D[p][q]$ and incorporated into the sum of calculated dependency values (lines 11 and 12 in Algorithm~\ref{alg:main}).
+For $p \in \{u+1, u+2, \cdots, u+w \}$ and $q \in \{ p+1, p+2, \cdots, u+w \}$ (lines 15-20 in Algorithm~\ref{alg:main}), our approach computes dependency values in a way similar to the above case. 
+Next, it computes $\BX{v}$ (line 21) according to Equation~(\ref{bet}).
+Note that $|\LV{v}{2}| = |\V{v}{0} \cup \V{v}{1} \cup \V{v}{2}| = 1 + u + w$ and $2 \cdot \sum_{p=1}^{u+w} \sum_{q = p+1}^{u+w} D[p][q] = \sum_{s \neq v \neq t \in V}\D{s}{t}{v} = \sum_{s \neq v \neq t \in V}\frac{\sigma_{st}(v)}{\sigma_{st}}$.
+
+\subsection{Algorithm Complexity}\label{discussion}
+
+Assume a vertex $v$ and its x-ego network $\XN{v}$ where $v$ has $u$ 1-hop neighbors (i.e., $u = |\V{v}{1}|$) and $w$ 2-hop neighbors (i.e., $w = |\V{v}{2}|$).
+Furthermore, assume that $\XN{v}$ contains $z$ edges.
+Given $\XN{v}$, the Brandes algorithm takes $O((u + w)z)$ time (Section~\ref{brandes}).
+In this case, our x-ego betweenness algorithm also takes $O((u + w)z)$ time as follows:
+
+\begin{theorem}
+\label{our_complexity} 
+Given a vertex $v$ and its x-ego network $\XN{v}$ where there are $z$ edges and $v$ has $u$ 1-hop neighbors and $w$ 2-hop neighbors, our x-ego betweenness algorithm (Algorithm~\ref{alg:main}) takes $O((u + w)z)$ time.
+\begin{proof}
+Algorithm~2 takes $O(|N[p]| + |N[q]|)$ time since the set intersection operation on line 5 can be completed in $O(|N[p]| + |N[q]|)$ time (e.g., by inserting the vertex indices from $N[p]$ into an array or a hash table and then finding each vertex from $N[q]$ in that array or hash table) and all other operations can be completed in $O(1)$ time.
+Algorithm~3 takes $O(|N[q]|)$ time since it examines every vertex index from $N[q]$ (lines 3-14) and may compute the harmonic mean of $|N[q]|$ values (line 15).
+Therefore, the overall time complexity of Algorithm~1 can be expressed as 
+\begin{eqnarray}
+&&O\Big(\sum_{p=1}^{u} \big(\sum_{q=p+1}^{u} (|N[p]| + |N[q]|) + \sum_{q=u+1}^{u+w} |N[q]|\big)\nonumber \\
+&&~~~+ \sum_{p=u+1}^{u+w} \sum_{q=p+1}^{u+w} |N[q]|\Big)\nonumber \\
+&=&
+O(\sum_{p=1}^{u} \sum_{q=p+1}^{u} |N[p]| + \sum_{p=1}^{u+w} \sum_{q=p+1}^{u+w} |N[q]|).\label{complexity}
+\end{eqnarray}
+Since the sum of the number of 1-hop neighbors for each vertex in $\XN{v}$ is $2z$ (that is, $\sum_{p=0}^{u+w} |N[p]|=2z$), we have
+\begin{eqnarray}
+&&~~~\sum_{p=1}^{u} \sum_{q=p+1}^{u} |N[p]| \nonumber \\
+&& \le \sum_{p=1}^{u} \sum_{q=1}^{u} |N[p]| = u \sum_{p=1}^{u} |N[p]| \le u \sum_{p=0}^{u+w} |N[p]| = 2uz \nonumber
+\end{eqnarray}
+and 
+\begin{eqnarray}
+&&~~~\sum_{p=1}^{u+w} \sum_{q=p+1}^{u+w} |N[q]| \nonumber \\
+&&\le \sum_{p=1}^{u+w} \sum_{q=0}^{u+w} |N[q]| = \sum_{p=1}^{u+w} (2z) = 2(u+w)z. \nonumber
+\end{eqnarray}
+Therefore, the above complexity (Equation (\ref{complexity})) can be expressed as $O(uz + (u+w)z) = O((u+w)z)$. \hfill\qed
+\end{proof}
+\end{theorem}
+
+% Let us assume that there are averagely $m$ 1-hop neighbors of a vertex in a x-ego network. 
+% Then, it has been known that the complexity of set intersection algorithm is $O(m)$ when hash data structure is used. From equation (\ref{harmonic_eq}), we know that the harmonic mean can be also computed in time $O(m)$. 
+% Accordingly, the complexity of algorithm is $O((u^2+uw+w^2)m)$. 
+% It is comparable to the Brandes algorithm of which complexity is $O(|V||E|)\approx O((u+w)\cdot(u+w)m)=O((u+w)^2m)$\cite{Brandes01afaster}. 
+
+While the Brandes algorithm and our algorithm have comparable worst case time complexity, the evaluation results in Section~\ref{efficiency} show that our algorithm outperforms the Brandes algorithm.
+One main reason for this phenomenon is that our algorithm can skip dependency computations according to Theorems~\ref{theorem1} and \ref{theorem3}.
+In the ideal situation where the dependency computations are skipped (i.e., the conditions on line 2 in Algorithm~\ref{alg:dependency1} and on line 9 in Algorithm~\ref{alg:dependency1} are met) as early as possible, both Algorithms~\ref{alg:dependency1} and \ref{alg:dependency2} will terminate in $O(1)$ time, there by reducing the time complexity of Algorithm~\ref{alg:main} from $O((u + w)z)$ to $O((u+w)^2)$. 
+% However, the proposed algorithm contains two conditions to skip the dependency computation based on the properties provided by Theorem 1 and 3. 
+% For example, let us think a DTN node constructing its expanded ego network after 2.9 days of {\em Infocom05} conference. 
+% If we assume that it creates a social link with other node when the accumulated contact duration between the two nodes is over 2,167 sec (i.e., 36 minutes), the skip rates observed in Algorithm 2 and 3 are $96.74\%$ and $56.60\%$, respectively (see Section \ref{efficiency}).
+The rate at which dependency computations are skipped increases as the {\em clustering coefficient} of each node (i.e., the number of links between a node's neighbors divided by the total number of possible links among them~\cite{community}) increases.
+Further details of that rate and its impact on x-ego betweenness computation are discussed in Section~\ref{efficiency}.
+\begin{table*}[t]
+\caption{Data Sets}\label{data_set} 
+\begin{center}\small
+\resizebox{17cm}{!} {
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+\multicolumn{2}{|>{\centering\arraybackslash}m{7.0cm}|}{} & {\em Infocom05} & {\em Infocom06} & {\em Cambridge} & {\em Intel} \tabularnewline
+\hline
+\hline
+\multicolumn{2}{|>{\centering\arraybackslash}m{7.0cm}|}{} & $41$ & $98$ & $12$ & $9$ \tabularnewline
+\multicolumn{2}{|>{\centering\arraybackslash}m{7.0cm}|}{Number of nodes} & (mobile: 41, & (mobile: 78, & (mobile: 12, & (mobile: 11,
+\tabularnewline
+\multicolumn{2}{|>{\centering\arraybackslash}m{7.0cm}|}{} & fixed: 0) & fixed: 20) & fixed: 0) & fixed: 1) \tabularnewline
+\hline
+\multicolumn{2}{|>{\centering\arraybackslash}m{7.0cm}|}{Number of contacts between nodes} & $22,459$ & $170,601$ & $4,228$ & $1,364$ \tabularnewline
+% \hline
+% Mean of contact duration (sec.)& $233.8$ & $166.1$ & $311.0$ & $660.5$ \\
+% \hline
+% Standard deviation of contact duration (sec.) & $833.7$ & $556.1$ & $725.1$ & $1,384.7$ \\
+\hline
+\multicolumn{2}{|>{\centering\arraybackslash}m{7.0cm}|}{Average number of contacts per node pair} & $14.3$ & $20.2$ & $32.0$ & $18.9$ \tabularnewline
+\hline
+\multicolumn{2}{|>{\centering\arraybackslash}m{7.0cm}|}{Mean of accumulated contact duration per node pair (sec.)}& $3,348$ & $3,356$ & $9,961$ & $12,495$ \tabularnewline
+\hline
+\multicolumn{2}{|>{\centering\arraybackslash}m{7.0cm}|}{Median of accumulated contact duration per node pair (sec.)}& $1,609$ & $1,253$ & $2,684$ & $4,936$ 
+% \hline
+% Minimum and maximum values of contact duration (sec.) & $1 \& 40,901$ & $1 \& 40,551$ & $1 \& 19,132$ & $1 \& 12,784$ \\
+\tabularnewline 
+\hline 
+ & $10\%$ & $5,921$ & $6,381$ & $19,606$ & $24,329$ \\
+ & $20\%$ & $3,818$ & $3,883$ & $7,786$ & $16,725$
+\\
+Link addition ratio ($\%$) & $30\%$ & $2,905$ & $2,568$ & $4,470$ & $10,915$
+\\
+ and & $40\%$ & $2,167$ & $1,815$ & $3,246$ & $6,572$
+\\
+Corresponding link addition & $50\%$ & $1,609$ & $1,253$ & $2,684$ & $4,936$
+\\
+threshold, $\theta$ (sec.) & $60\%$ & $1,214$ & $862$ & $2,187$ & $4,122$
+\\
+ & $70\%$ & $846$ & $506$ & $1,806$ & $2,211$
+\\
+ & $80\%$ & $468$ & $251$ & $1,566$ & $1,200$ 
+\\
+ & $90\%$ & $141$ & $10$ & $1,318$ & $9$
+\tabularnewline
+\hline
+\multicolumn{2}{|>{\centering\arraybackslash}m{7.0cm}|}{Data collection period, $\pi$ (sec.)} & $254,151$ & $337,419$ & $455,610$ & $359,191$ \tabularnewline
+\multicolumn{2}{|>{\centering\arraybackslash}m{7.0cm}|}{}& (2.9 days) & (3.9 days) &  (5.3 days) & (4.2 days) \tabularnewline
+\hline
+\end{tabular}
+}
+\end{center}
+\end{table*}
+% The computation skip rate may be inversely proportional to the {\em clustering coefficient} of a constructed network. 
+% Clustering coefficient is defined as the average number of links between a node's neighbors over the total number of possible links among them \cite{community}.
+% Neighbors of a node in x-ego networks are likely to be neighbors as well and this transitivity can be measured by clustering coefficient. 
+
+% In Section \ref{efficiency}, we will present the computation skip rates and the relation between the algorithm efficiency and clustering coefficient in details when the proposed algorithm is performed over networks constructed by using diverse real mobility traces.
+
+% \begin{algorithm}[t]
+% \DontPrintSemicolon
+% \KwIn{$s$, $t$, $N[1...u+w]$, $D[1...u+w][1...u+w]$}
+% $C \gets []$\;
+% \For{each $k \in N[t]$}{
+% 	\If {$s < k$}{
+% 		$\tau = D[s][k]$
+% 	}
+% 	\Else {
+% 		$\tau = D[k][s]$
+% 	}
+% 	\If {$\tau==0$}{
+% 		\Return{0.0}
+% 	}
+% 	\Else {
+% 		append $\tau$ to $C$
+% 	}
+% }
+% \Return{$H(C)$}
+% \caption{$dependency2(s, t, N, D)$}\label{alg:dependency2}
+% \end{algorithm}
+
+%Then, the fraction values in both $A_{12}$ and the upper triangular part of $A_{22}$ are computed based on Theorem \ref{harmonic}. By using Theorem \ref{harmonic}, Algorithm \ref{algo2} and \ref{algo3} further accumulate the expanded ego betweenness. Algorithm \ref{algo2} computes the fractions in the whole part of $A_{12}$. The total number of iterations of the most nested loop ({\it line $5-17$}) is $\alpha \cdot u \cdot w$, where $\alpha$ is the average degree of a node. Since we can generally assume that $\alpha$ is similar to $u$, the asymptotic time complexity of Algorithm \ref{algo2} is $O(u^2w)$. It should be noted that $v_k$ of the most nested loop as well as $v_s$ is always an 1-hop neighbor node and many pairs of two 1-hop neighbor nodes have a direct edge between the paired nodes. Not only these facts make $T[s][k]$ (or $T[k][s]$) zero in most cases (i.e., the most nested loop is frequently terminated in an early stage), but also they often cancel the execution of next task ({\it line $18-21$}) to compute the harmonic mean, which is the most time-consuming task in Algorithm \ref{algo2}. Consequently, the actual computational cost is not high. 
+
+
+% \begin{figure*}[th]
+% \centering
+% \subfigure[{\em Infocom05}]{\includegraphics[width=0.24\linewidth, trim=0cm 0cm 0cm 0cm]{1_contacts.pdf}}
+% \subfigure[{\em Infocom06}]{\includegraphics[width=0.24\linewidth, trim=0cm 0cm 0cm 0cm]{2_contacts.pdf}}
+% \subfigure[{\em Cambridge}]{\includegraphics[width=0.24\linewidth, trim=0cm 0cm 0cm 0cm]{3_contacts.pdf}}
+% \subfigure[{\em Intel}]{\includegraphics[width=0.24\linewidth, trim=0cm 0cm 0cm 0cm]{4_contacts.pdf}}
+% \caption{Cumulative contact durations and their mean/median values for node pairs (data sets have a lot of node pairs with low or middle cumulative contact duration and a few outliers with high one)}
+% \label{datasets}  
+% \end{figure*}
+%Algorithm \ref{algo3} accumulates the expanded ego betweenness further while computing the fractions in the upper triangular part of $A_{22}$ ({\it line $1-18$}) and finally normalizes the expanded ego betweenness to a value between 0 and 1 ({\it line $19$}). In the algorithm, the total number of iterations of the most nested loop ({\it line $5-12$}) is given by $\alpha \cdot w \cdot (w-1)/2$. Again, we can generally assume that $\alpha$ is similar to $u$. Accordingly, the asymptotic time complexity of Algorithm \ref{algo3} is $O(uw^2)$. Due to the similar reasons as the ones explained at Algorithm \ref{algo2}, the most nested loop in Algorithm \ref{algo3} is also frequently terminated in an early stage and the next task ({\it line $13-16$}) to compute the harmonic mean is often cancelled. These features make the actual computational cost of Algorithm \ref{algo3} moderate. 
+%

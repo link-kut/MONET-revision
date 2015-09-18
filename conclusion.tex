@@ -1,0 +1,17 @@
+\section{Conclusion}\label{conclusion}
+% In this paper, we proposed a new type of logical network called {\em x-ego network} and a new measure called {\em x-ego betweenness} to estimate a DTN node's real betweenness well. 
+% We also provided four properties of x-ego networks and proposed an efficient algorithm based on the four properties to compute x-ego betweenness. 
+% The proposed algorithm focuses to compute betweenness centrality of only one ego node in a given x-ego network, which is the essential reason why the skip ratio for {\em dependency1} and {\em dependency2} is significantly high. 
+% On the other hand, the Brandes algorithm tries to compute betweenness centrality of all nodes in a given network. 
+% This difference makes the proposed algorithm more superior to the Brandes algorithm when an x-ego network is given and its ego node's betweenness centrality is concerned. 
+% 
+% We believe that the proposed x-ego betweenness and algorithm have a wider applicability to many socially-aware DTN routing schemes where a node with high betweenness centrality has been mainly used as message mediator.
+% 
+% ////////////////
+
+In wireless networks, relaying messages via nodes with high betweenness centrality improves both the efficiency and reliability of message delivery.
+Computing the betweenness of each node, however, incurs impractically high network and computational overhead.
+In our approach, each node constructs its {\em x-ego network}, a logical network capturing the social links in its vicinity, and then computes its {\em x-ego betweenness} (i.e., its betweenness in its x-ego network) as an estimate of its true betweenness in the wireless network.
+By taking advantage of structural properties of x-ego networks, our algorithm quickly computes x-ego betweenness.
+Our evaluation results demonstrate that x-ego betweenness accurately estimates betweenness and our algorithm more quickly computes x-ego betweenness than the state-of-the-art betweenness computation algorithm 
+%\cite{bet-ady, bet-dnl, bet-dsdej, bet-dnl, bet-jmh, bet-epsj, bet-pmi, bet-pejj, bet-aady, bet-aoc, bet-mz}. 
